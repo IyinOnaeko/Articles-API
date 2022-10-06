@@ -51,10 +51,10 @@ app.post("/articles", function(req, res){
         title: req.body.title,  
         content: req.body.content
     })
-        if(!err) {
+    
             newArticle.save();
         res.send("New article saved");
-        }
+    
 })
 
 
