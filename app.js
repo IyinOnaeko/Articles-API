@@ -18,6 +18,28 @@ app.use(express.static("public"));
 mongoose.connect("mongodb://localhost:27017/wikiDB", { useNewUrlParser: true });
 
 
+//chaining route handlers
+app.route("/articles").get(function (req, res){
+    Article.find(function(err, foundArticles){
+        if(!err){
+        res.send(foundArticles);
+        } else {
+            res.send(err);
+        }
+
+    })
+}).post(function(req, res){
+    const newArticle = new Article ({
+        title: req.body.title,  
+        content: req.body.content
+    })
+    
+            newArticle.save();
+        res.send("New article saved");
+    
+}).delete()
+
+
 const articleSchema = {
     title: String,
     content: String
