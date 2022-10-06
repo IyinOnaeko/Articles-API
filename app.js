@@ -47,12 +47,14 @@ app.get("/articles", function (req, res){
 
 //create a new article and sending data to the server without a front-end
 app.post("/articles", function(req, res){
-    const newArticle = new {
+    const newArticle = new Article ({
         title: req.body.title,  
         content: req.body.content
-    }
-        newArticle.save();
+    })
+        if(!err) {
+            newArticle.save();
         res.send("New article saved");
+        }
 })
 
 
