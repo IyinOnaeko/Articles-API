@@ -30,10 +30,11 @@ const Article = mongoose.model("Article", articleSchema);
 
 //TODO
 
-const Article = new {
-
-}
-
+app.get("/articles", function (req, res){
+    Article.find(function(err, foundArticles){
+        console.log(foundArticles);
+    })
+})
 
 
 //get route
