@@ -28,19 +28,33 @@ const articleSchema = {
 const Article = mongoose.model("Article", articleSchema);
 
 
-//TODO
+//get route
+app.get("/", function(req, res) {
+    res.send("welcome to the simple article API");
+})
 
+//get all articles
 app.get("/articles", function (req, res){
     Article.find(function(err, foundArticles){
-        console.log(foundArticles);
+        if(!err){
+        res.send(foundArticles);
+        } else {
+            res.send(err);
+        }
+
     })
 })
 
-
-//get route
-app.get("/", function(req, res) {
-    
+//create a new article and sending data to the server without a front-end
+app.post("/articles", function(req, res){
+    const newArticle = new {
+        title: req.body.title,  
+        content: req.body.content
+    }
+        newArticle.save();
+        res.send("New article saved");
 })
+
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
