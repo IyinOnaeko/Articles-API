@@ -1,10 +1,11 @@
 //jshint esversion:6
-
+require("dotenv").config()
+const cors = require("cors");
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const _ = require("lodash")
+const _ = require("lodash");
 
 
 const app = express();
@@ -19,8 +20,9 @@ app.use(
 
 app.use(express.static("public"));
 
+const link = process.env.URL;
 //connect to db with mongoose
-mongoose.connect(Process.env.URL, { useNewUrlParser: true });
+mongoose.connect(link, { useNewUrlParser: true });
 
 
 const articleSchema = new mongoose.Schema ({
@@ -65,37 +67,66 @@ app
     });
   });
 
-//chaning routes: requests targeting specific articles 
-app.route("/articles/:title")
-    .get(function(req, res){
-          const articleTitle = req.params.title;
-          Article.findOne({title : articleTitle}, function(err, foundArticle) {
-            if(!err){
-                res.send(foundArticle);
-            } else{
-                res.send(err);
-            }
-          })
-    })
-    .put(function (req, res) {
-        let article = req.params.title;
 
-        let newTitle = req.body.title;
-        let newContent = req.body.content
-        Article.replaceOne({title: article}, 
-            {title: newTitle, content: newContent},
-            function(err){
-            if(!err){
-                res.send("update successful");
-            } else {
-                res.send(err);
-            }
-        }
-      );
+app.route("/articles/:articleTitle")
+
+.get(function(req, res){
+  const articleTitle = req.params.articleTitle;
+  Article.findOne({title: articleTitle}, function(err, article){
+    if (article){
+      const jsonArticle = JSON.stringify(article);
+      res.send(jsonArticle);
+    } else {
+      res.send("No article with that title found.");
+    }
+  });
+})
+
+.patch(function(req, res){
+  const articleTitle = req.params.articleTitle;
+  Article.update(
+    {title: articleTitle},
+    {content: req.body.newContent},
+    function(err){
+      if (!err){
+        res.send("Successfully updated selected article.");
+      } else {
+        res.send(err);
+      }
     });
+})
+
+.put(function(req, res){
+
+  const articleTitle = req.params.articleTitle;
+
+  Article.findOneAndUpdate(
+    {title: articleTitle},
+    { $push: { title : req.body.title, content: req.body.newContent}},
+    // {overwrite: true},
+    function(err){
+      if (!err){
+        res.send("Successfully updated the content of the selected article.");
+      } else {
+        res.send(err);
+      }
+    });
+})
 
 
-//get route
+.delete(function(req, res){
+  const articleTitle = req.params.articleTitle;
+  LostPet.findOneAndDelete({title: articleTitle}, function(err){
+    if (!err){
+      res.send("Successfully deleted selected article.");
+    } else {
+      res.send(err);
+    }
+  });
+});
+
+
+//get home route
 app.get("/", function (req, res) {
   res.send("welcome to the simple article API");
 });
