@@ -25,17 +25,17 @@ const link = process.env.URL;
 mongoose.connect(link, { useNewUrlParser: true });
 
 
-const articleSchema = new mongoose.Schema ({
+const articleSchema = {
   title: String,
-  content: String,
-});
+  content: String
+};
 
 //create new mongoose model using article schema
 const Article = mongoose.model("Article", articleSchema);
 
 //chaining route handlers: requests targetting all articles 
-app
-  .route("/articles")
+app.route("/articles")
+
   //get all articles
   .get(function (req, res) {
     Article.find(function (err, foundArticles) {
@@ -48,19 +48,24 @@ app
   })
   //create a new article and sending data to the server without a front-end
   .post(function (req, res) {
-    const newArticle = new Article({
+    const newArticle = Article({
       title: req.body.title,
-      content: req.body.content,
+      content: req.body.content
     });
 
-    newArticle.save();
-    res.send("New article saved");
+    newArticle.save( function(err){
+      if(!err){
+        res.send("Successfully saved a new Article")
+      } else {
+        res.send(err);
+      }
+    });
   })
   //delete articles
   .delete(function (req, res) {
     Article.deleteMany(function (err) {
       if (!err) {
-        res.send("delete successful");
+        res.send("deleted all articles successfully");
       } else {
         res.send(err);
       }
@@ -68,6 +73,7 @@ app
   });
 
 
+  //individual articles
 app.route("/articles/:articleTitle")
 
 .get(function(req, res){
@@ -83,8 +89,8 @@ app.route("/articles/:articleTitle")
 })
 
 .patch(function(req, res){
-  const articleTitle = req.params.articleTitle;
-  Article.update(
+  var articleTitle = req.params.articleTitle;
+  Article.findOneAndUpdate(
     {title: articleTitle},
     {content: req.body.newContent},
     function(err){
@@ -101,9 +107,9 @@ app.route("/articles/:articleTitle")
   const articleTitle = req.params.articleTitle;
 
   Article.findOneAndUpdate(
-    {title: articleTitle},
-    { $push: { title : req.body.title, content: req.body.newContent}},
-    // {overwrite: true},
+    {"title": articleTitle},
+    {title: req.body.title, content: req.body.content},
+    {overwrite: true},
     function(err){
       if (!err){
         res.send("Successfully updated the content of the selected article.");
