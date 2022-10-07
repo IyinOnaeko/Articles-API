@@ -125,7 +125,7 @@ app.route("/articles/:articleTitle")
 //delete specific articles
 .delete(function(req, res){
   const articleTitle = req.params.articleTitle;
-  LostPet.findOneAndDelete({title: articleTitle}, function(err){
+  Article.findOneAndDelete({title: articleTitle}, function(err){
     if (!err){
       res.send("Successfully deleted selected article.");
     } else {
