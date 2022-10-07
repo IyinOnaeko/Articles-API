@@ -88,11 +88,12 @@ app.route("/articles/:articleTitle")
   });
 })
 
+//patch replaces parts of the documents indicated
 .patch(function(req, res){
   var articleTitle = req.params.articleTitle;
   Article.findOneAndUpdate(
     {title: articleTitle},
-    {content: req.body.newContent},
+    {$set : req.body},
     function(err){
       if (!err){
         res.send("Successfully updated selected article.");
@@ -102,12 +103,14 @@ app.route("/articles/:articleTitle")
     });
 })
 
+
+//put replaces a whole document 
 .put(function(req, res){
 
   const articleTitle = req.params.articleTitle;
 
   Article.findOneAndUpdate(
-    {"title": articleTitle},
+    {title: articleTitle},
     {title: req.body.title, content: req.body.content},
     {overwrite: true},
     function(err){
@@ -119,7 +122,7 @@ app.route("/articles/:articleTitle")
     });
 })
 
-
+//delete specific articles
 .delete(function(req, res){
   const articleTitle = req.params.articleTitle;
   LostPet.findOneAndDelete({title: articleTitle}, function(err){
